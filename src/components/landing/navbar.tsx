@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { Menu, X, Waveform, Zap } from 'lucide-react'
+import { Menu, X, AudioLines, Zap } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 export function Navbar() {
@@ -17,11 +17,10 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
           ? 'bg-[#080B14]/90 backdrop-blur-xl border-b border-white/5 py-3'
           : 'bg-transparent py-5'
-      }`}
+        }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
