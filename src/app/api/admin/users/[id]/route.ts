@@ -12,8 +12,9 @@ const patchSchema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const session = await auth()
   const currentUser = session?.user as any
   if (!session || currentUser?.role !== 'admin') {
@@ -28,13 +29,12 @@ export async function PATCH(
 
   const updateData: any = { ...parsed.data }
 
-  // If changing plan, also update character limit
   if (parsed.data.subscriptionPlan) {
     updateData.charactersLimit = PLAN_LIMITS[parsed.data.subscriptionPlan].characters
   }
 
   const user = await prisma.user.update({
-    where: { id: params.id },
+    where: { id },
     data: updateData,
   })
 
@@ -43,19 +43,19 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const session = await auth()
   const currentUser = session?.user as any
   if (!session || currentUser?.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  // Prevent self-deletion
-  if (params.id === currentUser.id) {
+  if (id === currentUser.id) {
     return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 })
   }
 
-  await prisma.user.delete({ where: { id: params.id } })
+  await prisma.user.delete({ where: { id } })
   return NextResponse.json({ success: true })
 }

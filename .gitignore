@@ -46,3 +46,6 @@ coverage/
 # Misc
 *.log
 .cache
+
+.vercel
+.env*
