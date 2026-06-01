@@ -150,11 +150,10 @@ export function TTSStudio({ voices }: TTSStudioProps) {
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !text.trim() || !selectedVoice || charCount > MAX_CHARS}
-            className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
-              isGenerating || !text.trim() || !selectedVoice || charCount > MAX_CHARS
+            className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${isGenerating || !text.trim() || !selectedVoice || charCount > MAX_CHARS
                 ? 'bg-white/[0.04] text-white/30 cursor-not-allowed'
                 : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-900/30 hover:shadow-purple-900/50'
-            }`}
+              }`}
           >
             {isGenerating ? (
               <>
@@ -209,7 +208,10 @@ export function TTSStudio({ voices }: TTSStudioProps) {
                         background: isPlaying
                           ? 'linear-gradient(to top, #a855f7, #3b82f6)'
                           : 'rgba(255,255,255,0.15)',
-                        animation: isPlaying ? `waveform ${0.6 + (i % 5) * 0.15}s ease-in-out infinite` : 'none',
+                        animationName: isPlaying ? 'waveform' : 'none',
+                        animationDuration: `${0.6 + (i % 5) * 0.15}s`,
+                        animationTimingFunction: 'ease-in-out',
+                        animationIterationCount: 'infinite',
                         animationDelay: `${i * 30}ms`,
                       }}
                     />
@@ -255,11 +257,10 @@ export function TTSStudio({ voices }: TTSStudioProps) {
                 <button
                   key={lang}
                   onClick={() => setLangFilter(lang)}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
-                    langFilter === lang
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${langFilter === lang
                       ? 'bg-purple-600 text-white'
                       : 'bg-white/[0.04] text-white/50 hover:bg-white/[0.08] hover:text-white'
-                  }`}
+                    }`}
                 >
                   {lang === 'All' ? 'All' : lang.charAt(0) + lang.slice(1).toLowerCase()}
                 </button>
@@ -271,11 +272,10 @@ export function TTSStudio({ voices }: TTSStudioProps) {
                 <button
                   key={voice.id}
                   onClick={() => setSelectedVoice(voice)}
-                  className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-all ${
-                    selectedVoice?.id === voice.id
+                  className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-all ${selectedVoice?.id === voice.id
                       ? 'bg-purple-600/15 border border-purple-500/20 text-white'
                       : 'hover:bg-white/[0.04] text-white/60 hover:text-white'
-                  }`}
+                    }`}
                 >
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {voice.displayName.charAt(0)}
@@ -357,11 +357,10 @@ export function TTSStudio({ voices }: TTSStudioProps) {
                       <button
                         key={fmt}
                         onClick={() => setFormat(fmt)}
-                        className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
-                          format === fmt
+                        className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${format === fmt
                             ? 'bg-purple-600 text-white'
                             : 'bg-white/[0.04] text-white/50 hover:bg-white/[0.08]'
-                        }`}
+                          }`}
                       >
                         {fmt.toUpperCase()}
                       </button>

@@ -100,13 +100,12 @@ function VoiceCard({ voice }: { voice: typeof voices[0] }) {
 
           <div className="flex flex-wrap gap-1.5 mb-3">
             <span
-              className={`px-2 py-0.5 rounded-full text-xs border ${
-                voice.language === 'Khmer'
-                  ? 'border-amber-500/30 text-amber-400 bg-amber-500/10'
-                  : voice.language === 'English'
+              className={`px-2 py-0.5 rounded-full text-xs border ${voice.language === 'Khmer'
+                ? 'border-amber-500/30 text-amber-400 bg-amber-500/10'
+                : voice.language === 'English'
                   ? 'border-blue-500/30 text-blue-400 bg-blue-500/10'
                   : 'border-purple-500/30 text-purple-400 bg-purple-500/10'
-              }`}
+                }`}
             >
               {voice.language}
             </span>
@@ -129,9 +128,8 @@ function VoiceCard({ voice }: { voice: typeof voices[0] }) {
       <div className="flex items-center gap-3 mt-3 p-3 rounded-xl bg-white/5">
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-            isPlaying ? 'bg-white/20' : `bg-gradient-to-br ${voice.color}`
-          }`}
+          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isPlaying ? 'bg-white/20' : `bg-gradient-to-br ${voice.color}`
+            }`}
         >
           {isPlaying ? (
             <Square className="w-3 h-3 text-white" />
@@ -143,9 +141,10 @@ function VoiceCard({ voice }: { voice: typeof voices[0] }) {
           {Array.from({ length: 24 }, (_, i) => (
             <div
               key={i}
+              suppressHydrationWarning
               className="flex-1 rounded-full"
               style={{
-                height: `${20 + Math.sin(i * 0.8) * 60}%`,
+                height: `${20 + Math.sin(i * 0.8) * 60}%`.slice(0, 8) + '%',
                 background: isPlaying
                   ? `linear-gradient(to top, ${voice.color.includes('pink') ? '#ec4899' : voice.color.includes('blue') ? '#3b82f6' : '#a855f7'}, transparent)`
                   : 'rgba(255,255,255,0.15)',
@@ -187,11 +186,10 @@ export function VoiceShowcase() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  filter === f
-                    ? 'bg-white text-black'
-                    : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white border border-white/10'
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f
+                  ? 'bg-white text-black'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white border border-white/10'
+                  }`}
               >
                 {f}
               </button>

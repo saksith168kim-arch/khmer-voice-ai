@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth/config'
 import { prisma } from '@/lib/db/prisma'
 import { ttsService } from '@/lib/tts/service'
-import { uploadAudio } from '@/lib/storage/s3'
+import { put } from '@vercel/blob'
 import { z } from 'zod'
 
 const ttsSchema = z.object({
@@ -94,11 +94,20 @@ export async function POST(req: NextRequest) {
     )
 
     // Skip S3 - return audio directly as base64
-    const base64Audio = buffer.toString('base64')
-    const audioUrl = `data:audio/mpeg;base64,${base64Audio}`
-    const key = `local-${Date.now()}`
-    const url = audioUrl
+    // Upload to Vercel Blob
+    const filename = `audio/${userId}/${Date.now()}.mp3`
+    const blob = await put(filename, buffer, {
+      access: 'public',
+      contentType: 'audio/mpeg',
+    })
+    const key = filename
+    const url = blob.url
     const size = buffer.length
+
+    // Store buffer temporarily in global cache
+    if (!(global as any).audioCache) (global as any).audioCache = {}
+      ; (global as any).audioCache[key] = buffer
+    setTimeout(() => { delete (global as any).audioCache[key] }, 60000)
     // Create generation record
     const generation = await prisma.generation.create({
       data: {

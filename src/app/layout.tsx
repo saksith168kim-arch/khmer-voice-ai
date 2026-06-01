@@ -23,6 +23,11 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   title: {
     default: 'Khmer Voice AI — Convert Text to Natural Speech',
     template: '%s | Khmer Voice AI',
