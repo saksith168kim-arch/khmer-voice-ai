@@ -13,8 +13,9 @@ const patchSchema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const session = await auth()
   const currentUser = session?.user as any
   if (!session || currentUser?.role !== 'admin') {
@@ -28,7 +29,7 @@ export async function PATCH(
   }
 
   const voice = await prisma.voice.update({
-    where: { id: params.id },
+    where: { id },
     data: parsed.data,
   })
 
