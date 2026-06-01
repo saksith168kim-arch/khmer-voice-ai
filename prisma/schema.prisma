@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  INCOMPLETE
+}
+
+enum VoiceGender {
+  MALE
+  FEMALE
+  NEUTRAL
+}
+
+enum VoiceLanguage {
+  KHMER
+  ENGLISH
+  BILINGUAL
+}
+
+enum ApiKeyStatus {
+  ACTIVE
+  REVOKED
+}
+
+model User {
+  id                    String             @id @default(cuid())
+  name                  String?
+  email                 String             @unique
+  emailVerified         DateTime?
+  image                 String?
+  passwordHash          String?
+  subscriptionPlan      SubscriptionPlan   @default(FREE)
+  subscriptionStatus    SubscriptionStatus?
+  stripeCustomerId      String?            @unique
+  stripeSubscriptionId  String?            @unique
+  stripePriceId         String?
+  stripeCurrentPeriodEnd DateTime?
+  charactersUsed        Int                @default(0)
+  charactersLimit       Int                @default(10000)
+  role                  String             @default("user")
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  generations Generation[]
+  apiKeys     ApiKey[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Voice {
+  id            String        @id @default(cuid())
+  name          String
+  displayName   String
+  description   String?
+  language      VoiceLanguage
+  gender        VoiceGender
+  accent        String?
+  sampleAudioUrl String?
+  provider      String        @default("elevenlabs")
+  providerId    String?
+  tags          String[]
+  isActive      Boolean       @default(true)
+  isFeatured    Boolean       @default(false)
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  generations Generation[]
+
+  @@map("voices")
+}
+
+model Generation {
+  id             String   @id @default(cuid())
+  userId         String
+  voiceId        String
+  text           String   @db.Text
+  audioUrl       String?
+  audioKey       String?
+  charactersUsed Int
+  duration       Float?
+  fileSize       Int?
+  language       String?
+  speed          Float    @default(1.0)
+  pitch          Float    @default(1.0)
+  status         String   @default("completed")
+  provider       String   @default("elevenlabs")
+  createdAt      DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voice Voice @relation(fields: [voiceId], references: [id])
+
+  @@map("generations")
+}
+
+model ApiKey {
+  id          String       @id @default(cuid())
+  userId      String
+  name        String
+  key         String       @unique
+  status      ApiKeyStatus @default(ACTIVE)
+  lastUsedAt  DateTime?
+  usageCount  Int          @default(0)
+  createdAt   DateTime     @default(now())
+  expiresAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+model UsageLog {
+  id           String   @id @default(cuid())
+  userId       String
+  characters   Int
+  provider     String
+  voiceId      String?
+  apiKeyId     String?
+  createdAt    DateTime @default(now())
+
+  @@map("usage_logs")
+}
