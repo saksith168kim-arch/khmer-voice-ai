@@ -1,34 +1,34 @@
-import { auth } from '@/lib/auth/config'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
-export default auth((req) => {
-  const { nextUrl, auth: session } = req
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+  const { pathname } = req.nextUrl
 
   // Protect dashboard routes
-  if (nextUrl.pathname.startsWith('/dashboard') && !session) {
-    const loginUrl = new URL('/login', nextUrl.origin)
-    loginUrl.searchParams.set('callbackUrl', nextUrl.pathname)
+  if (pathname.startsWith('/dashboard') && !token) {
+    const loginUrl = new URL('/login', req.url)
+    loginUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
   // Protect admin routes
-  if (nextUrl.pathname.startsWith('/admin')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', nextUrl.origin))
+  if (pathname.startsWith('/admin')) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', req.url))
     }
-    const user = session.user as any
-    if (user?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', nextUrl.origin))
+    if ((token as any)?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', req.url))
     }
   }
 
   // Redirect logged-in users from auth pages
-  if (session && (nextUrl.pathname === '/login' || nextUrl.pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', nextUrl.origin))
+  if (token && (pathname === '/login' || pathname === '/register')) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
   matcher: ['/dashboard/:path*', '/admin/:path*', '/login', '/register'],
